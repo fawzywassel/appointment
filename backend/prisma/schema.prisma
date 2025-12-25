@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  VP
+  EA
+  ATTENDEE
+  ADMIN
+}
+
+enum CalendarProvider {
+  OUTLOOK
+  GOOGLE
+}
+
+enum MeetingType {
+  VIRTUAL
+  IN_PERSON
+}
+
+enum MeetingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum MeetingPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String               @unique
+  name                String
+  role                UserRole
+  ssoProvider         String?
+  timezone            String               @default("UTC")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  // Relations
+  calendarConnections CalendarConnection[]
+  availabilityRules   AvailabilityRule[]
+  meetingsAsVp        Meeting[]            @relation("VpMeetings")
+  meetingsAsAttendee  Meeting[]            @relation("AttendeeMeetings")
+  meetingsBookedBy    Meeting[]            @relation("BookedByMeetings")
+  delegationsAsVp     Delegation[]         @relation("VpDelegations")
+  delegationsAsEa     Delegation[]         @relation("EaDelegations")
+  notifications       Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model CalendarConnection {
+  id           String           @id @default(uuid())
+  userId       String
+  provider     CalendarProvider
+  accessToken  String
+  refreshToken String?
+  tokenExpiry  DateTime?
+  calendarId   String?
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model AvailabilityRule {
+  id            String   @id @default(uuid())
+  userId        String
+  bufferMinutes Int      @default(15)
+  workingHours  Json     // { "monday": [{"start": "09:00", "end": "17:00"}], ... }
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([userId])
+}
+
+model Meeting {
+  id         String          @id @default(uuid())
+  vpId       String
+  attendeeId String?
+  bookedById String?         // User who created the meeting (EA if booked on behalf)
+  startTime  DateTime
+  endTime    DateTime
+  type       MeetingType
+  status     MeetingStatus   @default(PENDING)
+  priority   MeetingPriority @default(MEDIUM)
+  location   String?
+  meetingUrl String?
+  isPrivate  Boolean         @default(false)
+  title      String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  // Relations
+  vp          User          @relation("VpMeetings", fields: [vpId], references: [id], onDelete: Cascade)
+  attendee    User?         @relation("AttendeeMeetings", fields: [attendeeId], references: [id], onDelete: SetNull)
+  bookedBy    User?         @relation("BookedByMeetings", fields: [bookedById], references: [id], onDelete: SetNull)
+  meetingForm MeetingForm?
+
+  @@index([vpId])
+  @@index([attendeeId])
+  @@index([bookedById])
+  @@index([startTime])
+  @@index([status])
+  @@index([priority])
+}
+
+model MeetingForm {
+  id        String   @id @default(uuid())
+  meetingId String   @unique
+  agendaUrl String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Delegation {
+  id          String   @id @default(uuid())
+  vpId        String
+  eaId        String
+  permissions Json     // { "canBook": true, "canCancel": true, "canView": true }
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vp User @relation("VpDelegations", fields: [vpId], references: [id], onDelete: Cascade)
+  ea User @relation("EaDelegations", fields: [eaId], references: [id], onDelete: Cascade)
+
+  @@unique([vpId, eaId])
+  @@index([vpId])
+  @@index([eaId])
+}
+
+model Notification {
+  id            String             @id @default(uuid())
+  userId        String
+  type          String             // "REMINDER", "DAILY_BRIEF", "CANCELLATION", etc.
+  scheduledTime DateTime
+  status        NotificationStatus @default(PENDING)
+  content       Json               // { "subject": "", "body": "", "meetingId": "" }
+  sentAt        DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([scheduledTime])
+  @@index([status])
+}
