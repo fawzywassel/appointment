@@ -15,5 +15,8 @@ RUN npx prisma generate
 # Expose port
 EXPOSE 3001
 
+# Install dependencies for Prisma
+RUN apk add --no-cache openssl
+
 # Start in development mode
 CMD ["npm", "run", "start:dev"]
