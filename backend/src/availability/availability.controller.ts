@@ -1,12 +1,12 @@
 import { Controller, Get, Put, Body, UseGuards, Query, Param } from '@nestjs/common';
-import { AvailabilityService } from './availability.service';
+import { AvailabilityService, TimeSlot } from './availability.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('availability')
 @UseGuards(JwtAuthGuard)
 export class AvailabilityController {
-  constructor(private availabilityService: AvailabilityService) {}
+  constructor(private availabilityService: AvailabilityService) { }
 
   /**
    * Get availability rules

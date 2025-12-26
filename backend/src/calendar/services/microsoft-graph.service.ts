@@ -19,7 +19,7 @@ export class MicrosoftGraphService {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   /**
    * Create Microsoft Graph client with user's access token
@@ -61,7 +61,7 @@ export class MicrosoftGraphService {
       code: code,
       redirect_uri: redirectUri,
       grant_type: 'authorization_code',
-    });
+    } as any);
 
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -95,7 +95,7 @@ export class MicrosoftGraphService {
       client_secret: clientSecret,
       refresh_token: refreshToken,
       grant_type: 'refresh_token',
-    });
+    } as any);
 
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -189,14 +189,14 @@ export class MicrosoftGraphService {
         },
         location: event.location
           ? {
-              displayName: event.location,
-            }
+            displayName: event.location,
+          }
           : undefined,
         body: event.body
           ? {
-              contentType: 'text',
-              content: event.body,
-            }
+            contentType: 'text',
+            content: event.body,
+          }
           : undefined,
       };
 

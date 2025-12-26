@@ -8,7 +8,7 @@ interface WorkingHours {
   [key: string]: { start: string; end: string }[];
 }
 
-interface TimeSlot {
+export interface TimeSlot {
   start: Date;
   end: Date;
   available: boolean;
@@ -19,7 +19,7 @@ export class AvailabilityService {
   constructor(
     private prisma: PrismaService,
     private calendarService: CalendarService,
-  ) {}
+  ) { }
 
   /**
    * Get or create availability rules for user

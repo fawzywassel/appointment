@@ -12,7 +12,7 @@ export class CalendarService {
     private prisma: PrismaService,
     private microsoftGraphService: MicrosoftGraphService,
     private googleCalendarService: GoogleCalendarService,
-  ) {}
+  ) { }
 
   /**
    * Get authorization URL for calendar provider
@@ -108,7 +108,7 @@ export class CalendarService {
         provider: true,
         calendarId: true,
         createdAt: true,
-        lastSyncedAt: true,
+        updatedAt: true,
       },
     });
 
@@ -118,7 +118,7 @@ export class CalendarService {
       provider: conn.provider,
       email: conn.calendarId, // Using calendarId as email placeholder
       connected: true,
-      lastSyncedAt: conn.lastSyncedAt?.toISOString(),
+      lastSyncedAt: conn.updatedAt?.toISOString(),
     }));
   }
 

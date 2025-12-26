@@ -4,7 +4,7 @@ import { CreateDelegationDto, UpdateDelegationDto, DelegationPermissions } from 
 
 @Injectable()
 export class DelegationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /**
    * Create delegation - VP delegates to EA
@@ -97,7 +97,7 @@ export class DelegationService {
       return false;
     }
 
-    const permissions = delegation.permissions as DelegationPermissions;
+    const permissions = delegation.permissions as unknown as DelegationPermissions;
     return permissions[permission] === true;
   }
 

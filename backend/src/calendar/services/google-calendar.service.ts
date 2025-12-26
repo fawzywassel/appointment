@@ -90,7 +90,7 @@ export class GoogleCalendarService {
         subject: event.visibility === 'private' ? 'Busy' : (event.summary || 'No title'),
         start: new Date(event.start?.dateTime || event.start?.date!),
         end: new Date(event.end?.dateTime || event.end?.date!),
-        location: event.location,
+        location: event.location || undefined,
         isPrivate: event.visibility === 'private',
       }));
     } catch (error) {
