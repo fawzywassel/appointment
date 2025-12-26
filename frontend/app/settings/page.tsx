@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 
@@ -153,10 +154,10 @@ export default function SettingsPage() {
         workingHours,
         bufferMinutes: defaultBufferMinutes,
       });
-      alert('Availability settings saved successfully!');
+      toast.success('Availability settings saved successfully!');
     } catch (error) {
       console.error('Error saving availability:', error);
-      alert('Failed to save availability settings');
+      toast.error('Failed to save availability settings');
     } finally {
       setSaving(false);
     }
@@ -169,10 +170,10 @@ export default function SettingsPage() {
         name: profile.name,
         timezone: profile.timezone,
       });
-      alert('Profile updated successfully!');
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+      toast.error('Failed to update profile');
     } finally {
       setSaving(false);
     }

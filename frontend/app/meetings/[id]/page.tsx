@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 import { format } from 'date-fns';
@@ -58,9 +59,9 @@ export default function MeetingDetailPage() {
   const handleUpdateStatus = async (newStatus: string) => {
     if (!meeting) return;
 
-    const confirmMessage = 
-      newStatus === 'CANCELLED' 
-        ? 'Are you sure you want to cancel this meeting?' 
+    const confirmMessage =
+      newStatus === 'CANCELLED'
+        ? 'Are you sure you want to cancel this meeting?'
         : `Update status to ${newStatus}?`;
 
     if (!confirm(confirmMessage)) return;
@@ -88,11 +89,11 @@ export default function MeetingDetailPage() {
     setActionLoading(true);
     try {
       await apiClient.delete(`/meetings/${meeting.id}`);
-      alert('Meeting deleted successfully');
+      toast.success('Meeting deleted successfully');
       router.push('/meetings');
     } catch (error) {
       console.error('Failed to delete meeting:', error);
-      alert('Failed to delete meeting');
+      toast.error('Failed to delete meeting');
       setActionLoading(false);
     }
   };
@@ -222,7 +223,7 @@ export default function MeetingDetailPage() {
         {/* Actions Card */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Status Actions */}
             {meeting.status === 'PENDING' && (
@@ -265,7 +266,7 @@ export default function MeetingDetailPage() {
 
             {/* Edit (placeholder) */}
             <button
-              onClick={() => alert('Edit functionality coming soon')}
+              onClick={() => toast('Edit functionality coming soon', { icon: '🚧' })}
               className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               Edit Meeting
@@ -285,7 +286,7 @@ export default function MeetingDetailPage() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(meeting.meetingUrl!);
-                  alert('Meeting link copied to clipboard!');
+                  toast.success('Meeting link copied to clipboard!');
                 }}
                 className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
               >
@@ -295,7 +296,7 @@ export default function MeetingDetailPage() {
 
             {/* Send Reminder (placeholder) */}
             <button
-              onClick={() => alert('Reminder functionality coming soon')}
+              onClick={() => toast('Reminder functionality coming soon', { icon: '🚧' })}
               className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               📧 Send Reminder

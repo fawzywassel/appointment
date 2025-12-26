@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 import { format, addDays, addMinutes } from 'date-fns';
@@ -149,11 +150,11 @@ export default function NewMeetingPage() {
         await apiClient.post('/meetings', payload);
       }
 
-      alert('Meeting created successfully!');
+      toast.success('Meeting created successfully!');
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Failed to create meeting:', error);
-      alert(error.response?.data?.message || 'Failed to create meeting');
+      toast.error(error.response?.data?.message || 'Failed to create meeting');
     } finally {
       setLoading(false);
     }
