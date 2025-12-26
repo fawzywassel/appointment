@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { format, startOfDay, endOfDay } from 'date-fns';
-import * as sgMail from '@sendgrid/mail';
+import sgMail from '@sendgrid/mail';
 import { Twilio } from 'twilio';
 
 export interface NotificationData {
@@ -30,21 +30,29 @@ export class NotificationsService {
   ) {
     // Initialize SendGrid
     const sendgridKey = this.configService.get<string>('SENDGRID_API_KEY');
-    if (sendgridKey) {
-      sgMail.setApiKey(sendgridKey);
-      this.logger.log('SendGrid initialized');
+    if (sendgridKey && sendgridKey.startsWith('SG.')) {
+      try {
+        sgMail.setApiKey(sendgridKey);
+        this.logger.log('SendGrid initialized');
+      } catch (error) {
+        this.logger.error('Failed to initialize SendGrid', error);
+      }
     } else {
-      this.logger.warn('SendGrid API key not configured');
+      this.logger.warn('SendGrid API key not configured or invalid (must start with "SG.")');
     }
 
     // Initialize Twilio
     const twilioSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     const twilioToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
-    if (twilioSid && twilioToken) {
-      this.twilioClient = new Twilio(twilioSid, twilioToken);
-      this.logger.log('Twilio initialized');
+    if (twilioSid && twilioToken && twilioSid.startsWith('AC')) {
+      try {
+        this.twilioClient = new Twilio(twilioSid, twilioToken);
+        this.logger.log('Twilio initialized');
+      } catch (error) {
+        this.logger.error('Failed to initialize Twilio', error);
+      }
     } else {
-      this.logger.warn('Twilio credentials not configured');
+      this.logger.warn('Twilio credentials not configured or invalid (SID must start with "AC")');
     }
   }
 
@@ -282,7 +290,7 @@ If you have any questions, please contact the organizer.
     for (const notification of notifications) {
       try {
         const content = notification.content as any;
-        
+
         // Send email
         await this.sendEmail(
           notification.user.email,
