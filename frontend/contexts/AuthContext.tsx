@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, ssoToken: string) => {
     try {
-      const response = await apiClient.post('/api/auth/login', {
+      const response = await apiClient.post('/auth/login', {
         email,
         ssoToken,
       });
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const localLogin = async (email: string, password: string) => {
     try {
-      const response = await apiClient.post('/api/auth/local/login', {
+      const response = await apiClient.post('/auth/local/login', {
         email,
         password,
       });

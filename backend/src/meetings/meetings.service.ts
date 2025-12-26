@@ -15,7 +15,7 @@ export class MeetingsService {
     private availabilityService: AvailabilityService,
     private virtualMeetingService: VirtualMeetingService,
     private notificationsService: NotificationsService,
-  ) {}
+  ) { }
 
   /**
    * Create a new meeting with conflict validation
@@ -62,11 +62,31 @@ export class MeetingsService {
       );
     }
 
+    // Resolve attendee if email provided
+    let attendeeId = dto.attendeeId;
+    if (!attendeeId && dto.attendeeEmail) {
+      let attendee = await this.prisma.user.findUnique({
+        where: { email: dto.attendeeEmail },
+      });
+
+      if (!attendee) {
+        attendee = await this.prisma.user.create({
+          data: {
+            email: dto.attendeeEmail,
+            name: dto.attendeeName || dto.attendeeEmail.split('@')[0],
+            role: 'ATTENDEE',
+            password: '', // No password for invited attendees initially
+          },
+        });
+      }
+      attendeeId = attendee.id;
+    }
+
     // Create meeting
     const meeting = await this.prisma.meeting.create({
       data: {
         vpId: dto.vpId,
-        attendeeId: dto.attendeeId,
+        attendeeId: attendeeId,
         bookedById: createdBy,
         startTime,
         endTime,
@@ -301,7 +321,7 @@ export class MeetingsService {
 
       // Validate and check conflicts if time changed
       if (startTime.getTime() !== meeting.startTime.getTime() ||
-          endTime.getTime() !== meeting.endTime.getTime()) {
+        endTime.getTime() !== meeting.endTime.getTime()) {
         const hasConflict = await this.calendarService.hasConflict(
           meeting.vpId,
           startTime,

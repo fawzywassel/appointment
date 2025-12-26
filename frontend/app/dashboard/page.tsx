@@ -49,8 +49,8 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       const [meetingsRes, statsRes] = await Promise.all([
-        apiClient.get('/api/meetings'),
-        apiClient.get('/api/meetings/stats'),
+        apiClient.get('/meetings'),
+        apiClient.get('/meetings/stats'),
       ]);
       setMeetings(meetingsRes.data.slice(0, 5)); // Show first 5
       setStats(statsRes.data);
@@ -135,19 +135,19 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <button 
+          <button
             onClick={() => router.push('/meetings/new')}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
           >
             Book New Meeting
           </button>
-          <button 
+          <button
             onClick={() => router.push('/meetings')}
             className="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
           >
             View Calendar
           </button>
-          <button 
+          <button
             onClick={() => router.push('/settings')}
             className="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
           >
@@ -193,13 +193,12 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          meeting.status === 'CONFIRMED'
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${meeting.status === 'CONFIRMED'
                             ? 'bg-green-100 text-green-800'
                             : meeting.status === 'PENDING'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
                       >
                         {meeting.status}
                       </span>

@@ -63,17 +63,39 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      // Fetch calendar connections
-      const connectionsRes = await apiClient.get('/calendar/connections');
+      // Fetch calendar connections and rules in parallel
+      const [connectionsRes, rulesRes] = await Promise.all([
+        apiClient.get('/calendar/connections').catch(() => ({ data: [] })),
+        apiClient.get('/availability/rules').catch(() => ({ data: {} })),
+      ]);
+
       setConnections(connectionsRes.data);
 
-      // Fetch availability rules
-      const rulesRes = await apiClient.get('/availability/rules');
-      if (rulesRes.data.rules) {
-        setAvailabilityRules(rulesRes.data.rules);
-      }
-      if (rulesRes.data.defaultBufferMinutes) {
-        setDefaultBufferMinutes(rulesRes.data.defaultBufferMinutes);
+
+      if (rulesRes.data) {
+        if (rulesRes.data.bufferMinutes !== undefined) {
+          setDefaultBufferMinutes(rulesRes.data.bufferMinutes);
+        }
+
+        const workingHours = rulesRes.data.workingHours || {};
+        const rules: AvailabilityRule[] = [];
+        const dayMap: { [key: string]: number } = {
+          sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
+        };
+
+        Object.entries(workingHours).forEach(([day, slots]: [string, any]) => {
+          if (Array.isArray(slots)) {
+            slots.forEach((slot: any) => {
+              rules.push({
+                dayOfWeek: dayMap[day.toLowerCase()] ?? 1,
+                startTime: slot.start,
+                endTime: slot.end,
+                bufferMinutes: rulesRes.data.bufferMinutes || 15, // buffer is global per user in this model
+              });
+            });
+          }
+        });
+        setAvailabilityRules(rules);
       }
 
       // Set profile from user
@@ -93,7 +115,9 @@ export default function SettingsPage() {
   };
 
   const handleConnectCalendar = (provider: 'microsoft' | 'google') => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/calendar/connect/${provider}`;
+    // Direct navigation to backend auth endpoint
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    window.location.href = `${baseUrl}/api/calendar/connect/${provider}`;
   };
 
   const handleDisconnectCalendar = async (provider: 'microsoft' | 'google') => {
@@ -108,9 +132,26 @@ export default function SettingsPage() {
   const handleSaveAvailability = async () => {
     setSaving(true);
     try {
+      // Transform rules back to workingHours format
+      const workingHours: { [key: string]: { start: string; end: string }[] } = {
+        sunday: [], monday: [], tuesday: [], wednesday: [], thursday: [], friday: [], saturday: []
+      };
+
+      const dayNamesLower = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+      availabilityRules.forEach(rule => {
+        const dayName = dayNamesLower[rule.dayOfWeek];
+        if (dayName) {
+          workingHours[dayName].push({
+            start: rule.startTime,
+            end: rule.endTime
+          });
+        }
+      });
+
       await apiClient.put('/availability/rules', {
-        rules: availabilityRules,
-        defaultBufferMinutes,
+        workingHours,
+        bufferMinutes: defaultBufferMinutes,
       });
       alert('Availability settings saved successfully!');
     } catch (error) {
@@ -185,31 +226,28 @@ export default function SettingsPage() {
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab('calendar')}
-                className={`px-6 py-4 text-sm font-medium border-b-2 ${
-                  activeTab === 'calendar'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'calendar'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Calendar Connections
               </button>
               <button
                 onClick={() => setActiveTab('availability')}
-                className={`px-6 py-4 text-sm font-medium border-b-2 ${
-                  activeTab === 'availability'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'availability'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Availability
               </button>
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`px-6 py-4 text-sm font-medium border-b-2 ${
-                  activeTab === 'profile'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'profile'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Profile
               </button>
@@ -233,7 +271,7 @@ export default function SettingsPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                         <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
+                          <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z" />
                         </svg>
                       </div>
                       <div>
@@ -278,7 +316,7 @@ export default function SettingsPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                         <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                          <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
                         </svg>
                       </div>
                       <div>

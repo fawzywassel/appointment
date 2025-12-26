@@ -10,6 +10,14 @@ export class CreateMeetingDto {
   @IsOptional()
   attendeeId?: string;
 
+  @IsEmail()
+  @IsOptional()
+  attendeeEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  attendeeName?: string;
+
   @IsDateString()
   @IsNotEmpty()
   startTime: string;

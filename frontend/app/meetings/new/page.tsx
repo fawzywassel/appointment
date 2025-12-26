@@ -21,7 +21,7 @@ export default function NewMeetingPage() {
 
   // Form state
   const [delegatedVPs, setDelegatedVPs] = useState<any[]>([]);
-  const [selectedVPId, setSelectedVPId] = useState<string>('');  
+  const [selectedVPId, setSelectedVPId] = useState<string>('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -139,6 +139,7 @@ export default function NewMeetingPage() {
         agenda: formData.agenda || undefined,
         notes: formData.notes || undefined,
         location: formData.type === 'IN_PERSON' ? formData.location : undefined,
+        vpId: user.id, // Add current user ID as VP ID
       };
 
       // If EA is booking for VP, use book-as endpoint
@@ -299,11 +300,10 @@ export default function NewMeetingPage() {
 
           {/* Conflict Detection */}
           {conflictMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
-              conflictMessage.includes('✅') 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
-            }`}>
+            <div className={`p-3 rounded-lg text-sm ${conflictMessage.includes('✅')
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
+              }`}>
               {conflictMessage}
             </div>
           )}
@@ -317,11 +317,10 @@ export default function NewMeetingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'VIRTUAL' })}
-                className={`p-4 border-2 rounded-lg transition-all ${
-                  formData.type === 'VIRTUAL'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
+                className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'VIRTUAL'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-300 hover:border-gray-400'
+                  }`}
               >
                 <div className="text-2xl mb-2">💻</div>
                 <div className="font-medium">Virtual</div>
@@ -330,11 +329,10 @@ export default function NewMeetingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'IN_PERSON' })}
-                className={`p-4 border-2 rounded-lg transition-all ${
-                  formData.type === 'IN_PERSON'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
+                className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'IN_PERSON'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-300 hover:border-gray-400'
+                  }`}
               >
                 <div className="text-2xl mb-2">📍</div>
                 <div className="font-medium">In-Person</div>
