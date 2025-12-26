@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 import { format, addDays, addMinutes } from 'date-fns';
@@ -123,6 +123,10 @@ export default function NewMeetingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error('Please log in to continue');
+      return;
+    }
     setLoading(true);
 
     try {
