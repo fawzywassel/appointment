@@ -15,6 +15,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, ssoToken: string) => Promise<void>;
+  localLogin: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -56,6 +57,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const localLogin = async (email: string, password: string) => {
+    try {
+      const response = await apiClient.post('/api/auth/local/login', {
+        email,
+        password,
+      });
+
+      const { accessToken, user: userData } = response.data;
+
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Local login failed:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
@@ -69,6 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         loading,
         login,
+        localLogin,
         logout,
         isAuthenticated: !!user,
       }}
