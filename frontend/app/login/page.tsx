@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('admin@rubt.com');
@@ -64,44 +66,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/bg.png"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      </div>
+
+      <div className="relative z-10 bg-white/95 backdrop-blur-md p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/20 mx-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            VP Scheduling
+          <div className="flex justify-center mb-6">
+            <div className="relative w-48 h-16">
+              <Image
+                src="/logo.png"
+                alt="VP Scheduling Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Welcome Back
           </h1>
-          <p className="text-gray-600">
-            Sign in to access your dashboard
+          <p className="text-gray-500 text-sm">
+            Sign in to access your scheduling dashboard
           </p>
         </div>
 
         {/* Login Method Tabs */}
-        <div className="flex mb-6 border-b border-gray-200">
+        <div className="flex mb-8 bg-gray-100/80 p-1 rounded-lg">
           <button
-            className={`flex-1 py-2 text-center font-medium transition-colors duration-200 ${loginMethod === 'local'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+            className={`flex-1 py-2 text-center text-sm font-medium rounded-md transition-all duration-200 ${loginMethod === 'local'
+              ? 'bg-white text-emerald-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setLoginMethod('local')}
           >
             Standard Login
           </button>
           <button
-            className={`flex-1 py-2 text-center font-medium transition-colors duration-200 ${loginMethod === 'sso'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+            className={`flex-1 py-2 text-center text-sm font-medium rounded-md transition-all duration-200 ${loginMethod === 'sso'
+              ? 'bg-white text-emerald-600 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setLoginMethod('sso')}
           >
-            SSO
+            SSO Access
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
             >
               Email Address
             </label>
@@ -110,9 +135,10 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="your.email@company.com"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+              placeholder="name@company.com"
               disabled={loading}
+              autoComplete="email"
             />
           </div>
 
@@ -120,7 +146,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-1.5"
               >
                 Password
               </label>
@@ -129,15 +155,17 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                placeholder="Enter your password"
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                placeholder="••••••••"
                 disabled={loading}
+                autoComplete="current-password"
               />
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+            <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-lg text-sm flex items-center animate-in fade-in slide-in-from-top-1">
+              <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               {error}
             </div>
           )}
@@ -146,30 +174,48 @@ export default function LoginPage() {
             <button
               onClick={handleLocalLogin}
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg shadow-emerald-600/20 transition-all duration-200 flex items-center justify-center space-x-2"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <span>Sign In</span>
+              )}
             </button>
           ) : (
-            <>
+            <div className="space-y-4">
               <button
                 onClick={handleSsoLogin}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg shadow-emerald-600/20 transition-all duration-200 flex items-center justify-center space-x-2"
               >
-                {loading ? 'Signing in...' : 'Sign in with SSO'}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  <span>Continue with SSO</span>
+                )}
               </button>
-              <div className="mt-4 text-center text-sm text-gray-500">
-                <p>
-                  This application uses Single Sign-On (SSO) authentication.
-                </p>
-                <p className="mt-1">
-                  Contact your IT administrator for access.
+              <div className="text-center">
+                <p className="text-xs text-gray-400">
+                  Restricted access. Contact IT for permissions.
                 </p>
               </div>
-            </>
+            </div>
           )}
         </div>
+      </div>
+
+      {/* Footer / Copyright */}
+      <div className="absolute bottom-6 left-0 right-0 text-center z-10">
+        <p className="text-white/40 text-xs text-shadow-sm">
+          &copy; {new Date().getFullYear()} VP Scheduling System. All rights reserved.
+        </p>
       </div>
     </div>
   );

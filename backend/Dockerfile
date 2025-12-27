@@ -16,6 +16,7 @@ RUN npm install
 COPY . .
 
 # Generate Prisma Client
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 
 # Expose port
