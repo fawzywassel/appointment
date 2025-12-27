@@ -15,9 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VP Scheduling Application",
-  description: "Schedule meetings with VPs efficiently",
+  title: "Appointment",
+  description: "Schedule meetings efficiently",
 };
+
+import Sidebar from "@/components/Sidebar";
 
 export default function RootLayout({
   children,
@@ -27,11 +29,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
         <AuthProvider>
           <ToasterProvider />
-          {children}
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 overflow-x-hidden">
+              {children}
+            </main>
+          </div>
         </AuthProvider>
       </body>
     </html>

@@ -1,4 +1,3 @@
-```javascript
 const axios = require('axios');
 
 async function main() {
@@ -10,14 +9,14 @@ async function main() {
             password: 'P@$$w0rd',
         });
 
-        const token = loginRes.data.access_token;
+        const token = loginRes.data.accessToken;
         const userId = loginRes.data.user.id;
-        console.log('Logged in. Token received.');
+        console.log('Logged in. Token received:', !!token, 'User ID:', userId);
 
         // 2. Book Meeting
         console.log('Attempting to book meeting...');
 
-        // Test Time: Saturday 15:00 Local (+03:00) => 12:00 UTC
+        // Test Time: 15:00 Local (+03:00) => 12:00 UTC
         // Working Hours: 09:00 - 17:00
 
         const startTime = '2025-12-27T15:00:00+03:00';
@@ -34,7 +33,7 @@ async function main() {
                 attendeeEmail: 'test-attendee@example.com'
             },
             {
-                headers: { Authorization: `Bearer ${ token } ` }
+                headers: { Authorization: `Bearer ${token}` }
             }
         );
 

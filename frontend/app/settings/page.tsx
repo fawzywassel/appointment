@@ -228,7 +228,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => setActiveTab('calendar')}
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'calendar'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
@@ -237,7 +237,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => setActiveTab('availability')}
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'availability'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
@@ -246,7 +246,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`px-6 py-4 text-sm font-medium border-b-2 ${activeTab === 'profile'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
@@ -270,8 +270,8 @@ export default function SettingsPage() {
                 <div className="border rounded-lg p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z" />
                         </svg>
                       </div>
@@ -303,7 +303,7 @@ export default function SettingsPage() {
                     ) : (
                       <button
                         onClick={() => handleConnectCalendar('microsoft')}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-700"
                       >
                         Connect
                       </button>
@@ -348,7 +348,7 @@ export default function SettingsPage() {
                     ) : (
                       <button
                         onClick={() => handleConnectCalendar('google')}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-700"
                       >
                         Connect
                       </button>
@@ -369,7 +369,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Default Buffer Time */}
-                <div className="border rounded-lg p-6 bg-blue-50">
+                <div className="border rounded-lg p-6 bg-sidebar-background">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Default Buffer Time (minutes)
                   </label>
@@ -383,7 +383,7 @@ export default function SettingsPage() {
                     step="5"
                     value={defaultBufferMinutes}
                     onChange={(e) => setDefaultBufferMinutes(parseInt(e.target.value))}
-                    className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
@@ -393,7 +393,7 @@ export default function SettingsPage() {
                     <h3 className="text-lg font-medium text-gray-900">Weekly Schedule</h3>
                     <button
                       onClick={addAvailabilityRule}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-700"
                     >
                       + Add Time Slot
                     </button>
@@ -404,7 +404,7 @@ export default function SettingsPage() {
                       <p className="text-gray-600">No availability rules set</p>
                       <button
                         onClick={addAvailabilityRule}
-                        className="mt-4 text-blue-600 hover:text-blue-800"
+                        className="mt-4 text-primary hover:text-emerald-700"
                       >
                         Add your first time slot
                       </button>
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                               <select
                                 value={rule.dayOfWeek}
                                 onChange={(e) => updateAvailabilityRule(index, 'dayOfWeek', parseInt(e.target.value))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                               >
                                 {dayNames.map((day, i) => (
                                   <option key={i} value={i}>
@@ -438,7 +438,7 @@ export default function SettingsPage() {
                                 type="time"
                                 value={rule.startTime}
                                 onChange={(e) => updateAvailabilityRule(index, 'startTime', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                               />
                             </div>
                             <div>
@@ -449,7 +449,7 @@ export default function SettingsPage() {
                                 type="time"
                                 value={rule.endTime}
                                 onChange={(e) => updateAvailabilityRule(index, 'endTime', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                               />
                             </div>
                             <div>
@@ -463,7 +463,7 @@ export default function SettingsPage() {
                                 step="5"
                                 value={rule.bufferMinutes}
                                 onChange={(e) => updateAvailabilityRule(index, 'bufferMinutes', parseInt(e.target.value))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                               />
                             </div>
                             <div>
@@ -485,7 +485,7 @@ export default function SettingsPage() {
                   <button
                     onClick={handleSaveAvailability}
                     disabled={saving}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                    className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
                   >
                     {saving ? 'Saving...' : 'Save Availability'}
                   </button>
@@ -524,7 +524,7 @@ export default function SettingsPage() {
                     type="text"
                     value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                   <select
                     value={profile.timezone}
                     onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   >
                     <option value="America/New_York">Eastern Time (ET)</option>
                     <option value="America/Chicago">Central Time (CT)</option>
@@ -566,7 +566,7 @@ export default function SettingsPage() {
                   <button
                     onClick={handleSaveProfile}
                     disabled={saving}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                    className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
                   >
                     {saving ? 'Saving...' : 'Save Profile'}
                   </button>

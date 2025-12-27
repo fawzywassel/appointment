@@ -182,7 +182,7 @@ export default function NewMeetingPage() {
           <div className="flex justify-between items-center h-16">
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-primary hover:text-emerald-800"
             >
               ← Back to Dashboard
             </button>
@@ -204,7 +204,7 @@ export default function NewMeetingPage() {
                 value={selectedVPId}
                 onChange={(e) => setSelectedVPId(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               >
                 {delegatedVPs.map((delegation) => (
                   <option key={delegation.vp.id} value={delegation.vp.id}>
@@ -229,7 +229,7 @@ export default function NewMeetingPage() {
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               placeholder="e.g., Strategy Review"
             />
           </div>
@@ -244,7 +244,7 @@ export default function NewMeetingPage() {
               value={formData.priority}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
             >
               <option value="LOW">🟢 Low Priority</option>
               <option value="MEDIUM">🟡 Medium Priority</option>
@@ -266,7 +266,7 @@ export default function NewMeetingPage() {
                 onChange={handleChange}
                 required
                 min={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               />
             </div>
             <div>
@@ -279,7 +279,7 @@ export default function NewMeetingPage() {
                 value={formData.startTime}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               />
             </div>
             <div>
@@ -291,7 +291,7 @@ export default function NewMeetingPage() {
                 value={formData.durationMinutes}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value={15}>15 minutes</option>
                 <option value={30}>30 minutes</option>
@@ -323,7 +323,7 @@ export default function NewMeetingPage() {
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'VIRTUAL' })}
                 className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'VIRTUAL'
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-primary bg-emerald-50'
                   : 'border-gray-300 hover:border-gray-400'
                   }`}
               >
@@ -335,7 +335,7 @@ export default function NewMeetingPage() {
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'IN_PERSON' })}
                 className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'IN_PERSON'
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-primary bg-emerald-50'
                   : 'border-gray-300 hover:border-gray-400'
                   }`}
               >
@@ -358,7 +358,7 @@ export default function NewMeetingPage() {
                 value={formData.location}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                 placeholder="e.g., Conference Room A, Building 2"
               />
             </div>
@@ -378,7 +378,7 @@ export default function NewMeetingPage() {
                   value={formData.attendeeName}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="John Doe"
                 />
               </div>
@@ -392,7 +392,7 @@ export default function NewMeetingPage() {
                   value={formData.attendeeEmail}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="john@example.com"
                 />
               </div>
@@ -409,7 +409,7 @@ export default function NewMeetingPage() {
               value={formData.agenda}
               onChange={handleChange}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               placeholder="Meeting agenda and topics to discuss..."
             />
           </div>
@@ -424,7 +424,7 @@ export default function NewMeetingPage() {
               value={formData.notes}
               onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               placeholder="Any additional information..."
             />
           </div>
@@ -441,7 +441,7 @@ export default function NewMeetingPage() {
             <button
               type="submit"
               disabled={loading || checkingConflict}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
             >
               {loading ? 'Creating...' : 'Create Meeting'}
             </button>
@@ -451,7 +451,7 @@ export default function NewMeetingPage() {
         {/* Available Slots Sidebar */}
         {availableSlots.length > 0 && (
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-medium text-blue-900 mb-3">💡 Available Slots Today</h3>
+            <h3 className="font-medium text-emerald-900 mb-3">💡 Available Slots Today</h3>
             <div className="space-y-2">
               {availableSlots.slice(0, 5).map((slot, index) => (
                 <button
@@ -461,7 +461,7 @@ export default function NewMeetingPage() {
                     const startTime = format(new Date(slot.start), 'HH:mm');
                     setFormData({ ...formData, startTime });
                   }}
-                  className="w-full text-left px-3 py-2 bg-white rounded border border-blue-300 hover:bg-blue-100 text-sm"
+                  className="w-full text-left px-3 py-2 bg-white rounded border border-emerald-300 hover:bg-emerald-100 text-sm"
                 >
                   {format(new Date(slot.start), 'h:mm a')} - {format(new Date(slot.end), 'h:mm a')}
                 </button>

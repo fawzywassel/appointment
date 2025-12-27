@@ -46,7 +46,7 @@ export default function UserListTable({ users, onEdit, onDelete }: UserListTable
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                   ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                        user.role === 'VP' ? 'bg-blue-100 text-blue-800' :
+                                        user.role === 'VP' ? 'bg-emerald-100 text-emerald-800' :
                                             user.role === 'EA' ? 'bg-green-100 text-green-800' :
                                                 'bg-gray-100 text-gray-800'}`}>
                                     {user.role}

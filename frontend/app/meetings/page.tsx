@@ -29,7 +29,7 @@ export default function MeetingsPage() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [filteredMeetings, setFilteredMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Filters
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [typeFilter, setTypeFilter] = useState('ALL');
@@ -102,14 +102,14 @@ export default function MeetingsPage() {
           <div className="flex justify-between items-center h-16">
             <button
               onClick={() => router.push('/dashboard')}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-primary hover:text-emerald-800"
             >
               ← Back to Dashboard
             </button>
             <h1 className="text-xl font-semibold text-gray-900">All Meetings</h1>
             <button
               onClick={() => router.push('/meetings/new')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-700"
             >
               + New Meeting
             </button>
@@ -128,7 +128,7 @@ export default function MeetingsPage() {
                 placeholder="Search meetings, attendees..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -137,7 +137,7 @@ export default function MeetingsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="ALL">All Status</option>
                 <option value="PENDING">Pending</option>
@@ -152,7 +152,7 @@ export default function MeetingsPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="ALL">All Types</option>
                 <option value="VIRTUAL">Virtual</option>
@@ -165,7 +165,7 @@ export default function MeetingsPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
               >
                 <option value="ALL">All Priorities</option>
                 <option value="URGENT">🔴 Urgent</option>
@@ -186,7 +186,7 @@ export default function MeetingsPage() {
         <div className="bg-white rounded-lg shadow">
           {loading ? (
             <div className="p-12 text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
               <p className="mt-4 text-gray-600">Loading meetings...</p>
             </div>
           ) : filteredMeetings.length === 0 ? (
@@ -200,7 +200,7 @@ export default function MeetingsPage() {
               </p>
               <button
                 onClick={() => router.push('/meetings/new')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-700"
               >
                 Create Meeting
               </button>
@@ -222,13 +222,13 @@ export default function MeetingsPage() {
                         <StatusBadge status={meeting.status} />
                         <PriorityBadge priority={meeting.priority} />
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
                         <div className="flex items-center space-x-2">
                           <span>📅</span>
                           <span>{format(new Date(meeting.startTime), 'PPp')}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <span>{meeting.type === 'VIRTUAL' ? '💻' : '📍'}</span>
                           <span>
@@ -236,14 +236,14 @@ export default function MeetingsPage() {
                             {meeting.location && ` - ${meeting.location}`}
                           </span>
                         </div>
-                        
+
                         {meeting.attendee && (
                           <div className="flex items-center space-x-2">
                             <span>👤</span>
                             <span>{meeting.attendee.name}</span>
                           </div>
                         )}
-                        
+
                         <div className="flex items-center space-x-2">
                           <span>👔</span>
                           <span>VP: {meeting.vp.name}</span>
@@ -264,7 +264,7 @@ export default function MeetingsPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"
+                            className="inline-flex items-center text-primary hover:text-emerald-700 text-sm font-medium"
                           >
                             Join Meeting →
                           </a>

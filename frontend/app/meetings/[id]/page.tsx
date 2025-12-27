@@ -102,7 +102,7 @@ export default function MeetingDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
           <p className="mt-4 text-gray-600">Loading meeting...</p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function MeetingDetailPage() {
           <div className="flex justify-between items-center h-16">
             <button
               onClick={() => router.push('/meetings')}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-primary hover:text-emerald-800"
             >
               ← Back to Meetings
             </button>
@@ -144,17 +144,17 @@ export default function MeetingDetailPage() {
 
           {/* Join Link - Prominent */}
           {meeting.meetingUrl && meeting.status === 'CONFIRMED' && (
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-900 mb-1">Virtual Meeting Link</p>
-                  <p className="text-xs text-blue-700">Click to join the meeting</p>
+                  <p className="text-sm font-medium text-emerald-900 mb-1">Virtual Meeting Link</p>
+                  <p className="text-xs text-emerald-700">Click to join the meeting</p>
                 </div>
                 <a
                   href={meeting.meetingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 font-medium"
                 >
                   Join Meeting →
                 </a>
@@ -250,7 +250,7 @@ export default function MeetingDetailPage() {
                 <button
                   onClick={() => handleUpdateStatus('COMPLETED')}
                   disabled={actionLoading}
-                  className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                  className="px-4 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
                 >
                   Mark as Completed
                 </button>

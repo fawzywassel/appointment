@@ -21,120 +21,126 @@ export class MeetingsService {
    * Create a new meeting with conflict validation
    */
   async createMeeting(dto: CreateMeetingDto, createdBy: string) {
-    const startTime = new Date(dto.startTime);
-    const endTime = new Date(dto.endTime);
+    console.log('MeetingsService.createMeeting called by:', createdBy);
+    try {
+      const startTime = new Date(dto.startTime);
+      const endTime = new Date(dto.endTime);
 
-    // Validate time slot
-    if (startTime >= endTime) {
-      throw new BadRequestException('End time must be after start time');
-    }
+      // Validate time slot
+      if (startTime >= endTime) {
+        throw new BadRequestException('End time must be after start time');
+      }
 
-    // Check for conflicts
-    const hasConflict = await this.calendarService.hasConflict(
-      dto.vpId,
-      startTime,
-      endTime,
-    );
-
-    if (hasConflict) {
-      throw new BadRequestException('Time slot conflicts with existing meeting');
-    }
-
-    // Check availability
-    const isAvailable = await this.availabilityService.isSlotAvailable(
-      dto.vpId,
-      startTime,
-      endTime,
-    );
-
-    if (!isAvailable) {
-      throw new BadRequestException('Time slot is outside working hours');
-    }
-
-    // Generate meeting URL for virtual meetings
-    let meetingUrl: string | null = null;
-    if (dto.type === MeetingType.VIRTUAL) {
-      meetingUrl = await this.virtualMeetingService.generateMeetingLink(
-        'temp-id',
-        dto.title || 'Meeting',
+      // Check for conflicts
+      const hasConflict = await this.calendarService.hasConflict(
+        dto.vpId,
         startTime,
         endTime,
       );
-    }
 
-    // Resolve attendee if email provided
-    let attendeeId = dto.attendeeId;
-    if (!attendeeId && dto.attendeeEmail) {
-      let attendee = await this.prisma.user.findUnique({
-        where: { email: dto.attendeeEmail },
+      if (hasConflict) {
+        throw new BadRequestException('Time slot conflicts with existing meeting');
+      }
+
+      // Check availability
+      const isAvailable = await this.availabilityService.isSlotAvailable(
+        dto.vpId,
+        startTime,
+        endTime,
+      );
+
+      if (!isAvailable) {
+        throw new BadRequestException('Time slot is outside working hours');
+      }
+
+      // Generate meeting URL for virtual meetings
+      let meetingUrl: string | null = null;
+      if (dto.type === MeetingType.VIRTUAL) {
+        meetingUrl = await this.virtualMeetingService.generateMeetingLink(
+          'temp-id',
+          dto.title || 'Meeting',
+          startTime,
+          endTime,
+        );
+      }
+
+      // Resolve attendee if email provided
+      let attendeeId = dto.attendeeId;
+      if (!attendeeId && dto.attendeeEmail) {
+        let attendee = await this.prisma.user.findUnique({
+          where: { email: dto.attendeeEmail },
+        });
+
+        if (!attendee) {
+          attendee = await this.prisma.user.create({
+            data: {
+              email: dto.attendeeEmail,
+              name: dto.attendeeName || dto.attendeeEmail.split('@')[0],
+              role: 'ATTENDEE',
+              password: '', // No password for invited attendees initially
+            },
+          });
+        }
+        attendeeId = attendee.id;
+      }
+
+      // Create meeting
+      const meeting = await this.prisma.meeting.create({
+        data: {
+          vpId: dto.vpId,
+          attendeeId: attendeeId,
+          bookedById: createdBy,
+          startTime,
+          endTime,
+          type: dto.type,
+          status: MeetingStatus.PENDING,
+          priority: dto.priority || MeetingPriority.MEDIUM,
+          location: dto.location,
+          meetingUrl,
+          title: dto.title,
+          isPrivate: dto.isPrivate || false,
+        },
+        include: {
+          vp: { select: { id: true, name: true, email: true } },
+          attendee: { select: { id: true, name: true, email: true } },
+          bookedBy: { select: { id: true, name: true, email: true } },
+        },
       });
 
-      if (!attendee) {
-        attendee = await this.prisma.user.create({
+      // Update meeting URL with actual ID
+      if (dto.type === MeetingType.VIRTUAL && meetingUrl) {
+        const actualUrl = await this.virtualMeetingService.generateMeetingLink(
+          meeting.id,
+          meeting.title || 'Meeting',
+          startTime,
+          endTime,
+        );
+        await this.prisma.meeting.update({
+          where: { id: meeting.id },
+          data: { meetingUrl: actualUrl },
+        });
+      }
+
+      // Create meeting form if agenda/notes provided
+      if (dto.agenda || dto.notes) {
+        await this.prisma.meetingForm.create({
           data: {
-            email: dto.attendeeEmail,
-            name: dto.attendeeName || dto.attendeeEmail.split('@')[0],
-            role: 'ATTENDEE',
-            password: '', // No password for invited attendees initially
+            meetingId: meeting.id,
+            agendaUrl: dto.agenda,
+            notes: dto.notes,
           },
         });
       }
-      attendeeId = attendee.id;
+
+      // Send confirmation and schedule reminder
+      await this.notificationsService.sendMeetingConfirmation(meeting);
+      await this.notificationsService.scheduleMeetingReminder(meeting);
+
+      return meeting;
+    } catch (error) {
+      console.error('MeetingsService.createMeeting failed:', error);
+      throw error;
     }
-
-    // Create meeting
-    const meeting = await this.prisma.meeting.create({
-      data: {
-        vpId: dto.vpId,
-        attendeeId: attendeeId,
-        bookedById: createdBy,
-        startTime,
-        endTime,
-        type: dto.type,
-        status: MeetingStatus.PENDING,
-        priority: dto.priority || MeetingPriority.MEDIUM,
-        location: dto.location,
-        meetingUrl,
-        title: dto.title,
-        isPrivate: dto.isPrivate || false,
-      },
-      include: {
-        vp: { select: { id: true, name: true, email: true } },
-        attendee: { select: { id: true, name: true, email: true } },
-        bookedBy: { select: { id: true, name: true, email: true } },
-      },
-    });
-
-    // Update meeting URL with actual ID
-    if (dto.type === MeetingType.VIRTUAL && meetingUrl) {
-      const actualUrl = await this.virtualMeetingService.generateMeetingLink(
-        meeting.id,
-        meeting.title || 'Meeting',
-        startTime,
-        endTime,
-      );
-      await this.prisma.meeting.update({
-        where: { id: meeting.id },
-        data: { meetingUrl: actualUrl },
-      });
-    }
-
-    // Create meeting form if agenda/notes provided
-    if (dto.agenda || dto.notes) {
-      await this.prisma.meetingForm.create({
-        data: {
-          meetingId: meeting.id,
-          agendaUrl: dto.agenda,
-          notes: dto.notes,
-        },
-      });
-    }
-
-    // Send confirmation and schedule reminder
-    await this.notificationsService.sendMeetingConfirmation(meeting);
-    await this.notificationsService.scheduleMeetingReminder(meeting);
-
-    return meeting;
   }
 
   /**
