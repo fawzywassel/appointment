@@ -7,6 +7,23 @@ import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 import { format } from 'date-fns';
 import StatusBadge from '@/components/StatusBadge';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Video,
+  User,
+  FileText,
+  CheckCircle,
+  XCircle,
+  ArrowLeft,
+  Trash2,
+  Edit,
+  Copy,
+  Mail,
+  Loader2,
+  MoreVertical
+} from 'lucide-react';
 
 interface Meeting {
   id: string;
@@ -49,7 +66,7 @@ export default function MeetingDetailPage() {
       setMeeting(response.data);
     } catch (error) {
       console.error('Failed to fetch meeting:', error);
-      alert('Failed to load meeting');
+      toast.error('Failed to load meeting details');
       router.push('/meetings');
     } finally {
       setLoading(false);
@@ -69,11 +86,11 @@ export default function MeetingDetailPage() {
     setActionLoading(true);
     try {
       await apiClient.patch(`/meetings/${meeting.id}`, { status: newStatus });
-      alert('Meeting updated successfully!');
+      toast.success(`Meeting status updated to ${newStatus}`);
       fetchMeeting();
     } catch (error) {
       console.error('Failed to update meeting:', error);
-      alert('Failed to update meeting');
+      toast.error('Failed to update status');
     } finally {
       setActionLoading(false);
     }
@@ -102,8 +119,8 @@ export default function MeetingDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
-          <p className="mt-4 text-gray-600">Loading meeting...</p>
+          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">Loading meeting details...</p>
         </div>
       </div>
     );
@@ -114,199 +131,239 @@ export default function MeetingDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => router.push('/meetings')}
-              className="text-primary hover:text-emerald-800"
-            >
-              ← Back to Meetings
-            </button>
-            <h1 className="text-xl font-semibold text-gray-900">Meeting Details</h1>
-            <div className="w-32"></div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Card */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {meeting.title || 'Untitled Meeting'}
-              </h2>
-              <StatusBadge status={meeting.status} />
-            </div>
-          </div>
-
-          {/* Join Link - Prominent */}
-          {meeting.meetingUrl && meeting.status === 'CONFIRMED' && (
-            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-emerald-900 mb-1">Virtual Meeting Link</p>
-                  <p className="text-xs text-emerald-700">Click to join the meeting</p>
-                </div>
-                <a
-                  href={meeting.meetingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 font-medium"
-                >
-                  Join Meeting →
-                </a>
-              </div>
-            </div>
-          )}
-
-          {/* Meeting Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">Date & Time</label>
-              <p className="text-gray-900">
-                {format(new Date(meeting.startTime), 'PPPP')}
-              </p>
-              <p className="text-gray-900">
-                {format(new Date(meeting.startTime), 'p')} - {format(new Date(meeting.endTime), 'p')}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">Meeting Type</label>
-              <p className="text-gray-900">
-                {meeting.type === 'VIRTUAL' ? '💻 Virtual Meeting' : '📍 In-Person Meeting'}
-              </p>
-              {meeting.location && (
-                <p className="text-gray-600 text-sm mt-1">{meeting.location}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">VP</label>
-              <p className="text-gray-900">{meeting.vp.name}</p>
-              <p className="text-gray-600 text-sm">{meeting.vp.email}</p>
-            </div>
-
-            {meeting.attendee && (
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">Attendee</label>
-                <p className="text-gray-900">{meeting.attendee.name}</p>
-                <p className="text-gray-600 text-sm">{meeting.attendee.email}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Agenda Card */}
-        {(meeting.agenda || meeting.forms?.[0]?.agenda) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Agenda</h3>
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {meeting.agenda || meeting.forms?.[0]?.agenda}
-            </p>
-          </div>
-        )}
-
-        {/* Notes Card */}
-        {(meeting.notes || meeting.forms?.[0]?.notes) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Additional Notes</h3>
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {meeting.notes || meeting.forms?.[0]?.notes}
-            </p>
-          </div>
-        )}
-
-        {/* Actions Card */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Status Actions */}
-            {meeting.status === 'PENDING' && (
-              <>
-                <button
-                  onClick={() => handleUpdateStatus('CONFIRMED')}
-                  disabled={actionLoading}
-                  className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
-                >
-                  ✓ Confirm Meeting
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus('CANCELLED')}
-                  disabled={actionLoading}
-                  className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
-                >
-                  ✕ Cancel Meeting
-                </button>
-              </>
-            )}
-
-            {meeting.status === 'CONFIRMED' && (
-              <>
-                <button
-                  onClick={() => handleUpdateStatus('COMPLETED')}
-                  disabled={actionLoading}
-                  className="px-4 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
-                >
-                  Mark as Completed
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus('CANCELLED')}
-                  disabled={actionLoading}
-                  className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
-                >
-                  ✕ Cancel Meeting
-                </button>
-              </>
-            )}
-
-            {/* Edit (placeholder) */}
-            <button
-              onClick={() => toast('Edit functionality coming soon', { icon: '🚧' })}
-              className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              Edit Meeting
-            </button>
-
-            {/* Delete */}
-            <button
-              onClick={handleDelete}
-              disabled={actionLoading}
-              className="px-4 py-3 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 disabled:bg-gray-100"
-            >
-              🗑 Delete Meeting
-            </button>
-
-            {/* Copy Meeting URL */}
-            {meeting.meetingUrl && (
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Vibrant Header */}
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-500 pb-24 pt-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center space-x-3 mb-2">
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(meeting.meetingUrl!);
-                  toast.success('Meeting link copied to clipboard!');
-                }}
-                className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                onClick={() => router.push('/meetings')}
+                className="text-emerald-100 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
               >
-                📋 Copy Meeting Link
+                <ArrowLeft className="w-5 h-5" />
               </button>
-            )}
-
-            {/* Send Reminder (placeholder) */}
-            <button
-              onClick={() => toast('Reminder functionality coming soon', { icon: '🚧' })}
-              className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              📧 Send Reminder
-            </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium text-emerald-100 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm">
+                  {meeting.type === 'VIRTUAL' ? 'Virtual Meeting' : 'In-Person Meeting'}
+                </span>
+                <span className={`text-sm font-medium px-3 py-1 rounded-full border backdrop-blur-sm ${meeting.status === 'CONFIRMED' ? 'bg-emerald-400/20 text-emerald-50 border-emerald-400/30' :
+                    meeting.status === 'PENDING' ? 'bg-amber-400/20 text-amber-50 border-amber-400/30' :
+                      meeting.status === 'CANCELLED' ? 'bg-red-400/20 text-red-50 border-red-400/30' :
+                        'bg-blue-400/20 text-blue-50 border-blue-400/30'
+                  }`}>
+                  {meeting.status}
+                </span>
+              </div>
+            </div>
+            <div className="pl-9">
+              <h1 className="text-3xl font-bold text-white mb-2">{meeting.title || 'Untitled Meeting'}</h1>
+              <div className="flex items-center text-emerald-50 text-base space-x-6">
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-2 opacity-80" />
+                  {format(new Date(meeting.startTime), 'EEEE, MMMM d, yyyy')}
+                </div>
+                <div className="flex items-center">
+                  <Clock className="w-4 h-4 mr-2 opacity-80" />
+                  {format(new Date(meeting.startTime), 'h:mm a')} - {format(new Date(meeting.endTime), 'h:mm a')}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Meeting ID (for reference) */}
-        <div className="mt-6 text-center text-xs text-gray-500">
-          Meeting ID: {meeting.id}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* Left Column: Details */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* Join Link - Prominent */}
+            {meeting.meetingUrl && meeting.status !== 'CANCELLED' && (
+              <div className="bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
+                <div className="bg-emerald-50/50 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+                      <Video className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Join Meeting</h3>
+                      <p className="text-sm text-gray-600">Video conference link available</p>
+                    </div>
+                  </div>
+                  <a
+                    href={meeting.meetingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 text-center"
+                  >
+                    Launch Meeting
+                  </a>
+                </div>
+              </div>
+            )}
+            {meeting.location && meeting.type === 'IN_PERSON' && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 flex items-start space-x-4">
+                  <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">In-Person Location</h3>
+                    <p className="text-gray-600 text-lg">{meeting.location}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+            {/* Agenda & Notes */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
+                <h3 className="font-semibold text-gray-900 flex items-center">
+                  <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                  Meeting Content
+                </h3>
+              </div>
+              <div className="p-6 space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Agenda</h4>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {meeting.agenda || meeting.forms?.[0]?.agenda || 'No agenda provided for this meeting.'}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Additional Notes</h4>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-100 text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {meeting.notes || meeting.forms?.[0]?.notes || 'No additional notes.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Column: People & Actions */}
+          <div className="space-y-6">
+
+            {/* Participants */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <User className="w-4 h-4 mr-2 text-gray-400" />
+                Participants
+              </h3>
+              <div className="space-y-4">
+                {/* VP */}
+                <div className="flex items-center p-3 rounded-lg bg-gray-50 border border-gray-100">
+                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-sm mr-3">
+                    {meeting.vp.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate">{meeting.vp.name}</p>
+                    <p className="text-xs text-gray-500 truncate">VP (Organizer)</p>
+                  </div>
+                </div>
+
+                {/* Attendee */}
+                {meeting.attendee && (
+                  <div className="flex items-center p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm mr-3">
+                      {meeting.attendee.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 truncate">{meeting.attendee.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{meeting.attendee.email}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <MoreVertical className="w-4 h-4 mr-2 text-gray-400" />
+                Actions
+              </h3>
+              <div className="space-y-3">
+                {meeting.status === 'PENDING' && (
+                  <>
+                    <button
+                      onClick={() => handleUpdateStatus('CONFIRMED')}
+                      disabled={actionLoading}
+                      className="w-full flex items-center justify-center px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-emerald-400 transition-colors text-sm font-medium"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Confirm Meeting
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus('CANCELLED')}
+                      disabled={actionLoading}
+                      className="w-full flex items-center justify-center px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:bg-gray-50 transition-colors text-sm font-medium"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Cancel Request
+                    </button>
+                  </>
+                )}
+
+                {meeting.status === 'CONFIRMED' && (
+                  <>
+                    <button
+                      onClick={() => handleUpdateStatus('COMPLETED')}
+                      disabled={actionLoading}
+                      className="w-full flex items-center justify-center px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors text-sm font-medium"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as Completed
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus('CANCELLED')}
+                      disabled={actionLoading}
+                      className="w-full flex items-center justify-center px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:bg-gray-50 transition-colors text-sm font-medium"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Cancel Meeting
+                    </button>
+                  </>
+                )}
+
+                <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
+                  {/* Copy Link */}
+                  {meeting.meetingUrl && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(meeting.meetingUrl!);
+                        toast.success('Link copied!');
+                      }}
+                      className="flex flex-col items-center justify-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all text-gray-600"
+                    >
+                      <Copy className="w-5 h-5 mb-1 text-gray-400" />
+                      <span className="text-xs font-medium">Copy Link</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => toast('Edit unavailable', { description: 'This feature is currently under development.' })}
+                    className="flex flex-col items-center justify-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all text-gray-600"
+                  >
+                    <Edit className="w-5 h-5 mb-1 text-gray-400" />
+                    <span className="text-xs font-medium">Edit</span>
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={actionLoading}
+                    className="col-span-2 flex flex-col items-center justify-center p-3 rounded-lg border border-red-100 bg-red-50/50 hover:bg-red-50 hover:border-red-200 transition-all text-red-600"
+                  >
+                    <Trash2 className="w-5 h-5 mb-1 text-red-400" />
+                    <span className="text-xs font-medium">Delete Meeting</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </main>
     </div>

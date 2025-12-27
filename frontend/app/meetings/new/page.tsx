@@ -6,6 +6,18 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/api-client';
 import { format, addDays, addMinutes } from 'date-fns';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Video,
+  User,
+  AlignLeft,
+  CheckCircle,
+  AlertTriangle,
+  ArrowLeft,
+  Loader2
+} from 'lucide-react';
 
 interface AvailableSlot {
   start: string;
@@ -100,9 +112,9 @@ export default function NewMeetingPage() {
       });
 
       if (response.data.busyTimes && response.data.busyTimes.length > 0) {
-        setConflictMessage('⚠️ This time slot conflicts with existing meetings');
+        setConflictMessage('CONFLICT');
       } else {
-        setConflictMessage('✅ No conflicts detected');
+        setConflictMessage('SAFE');
       }
     } catch (error) {
       console.error('Failed to check conflicts:', error);
@@ -176,299 +188,356 @@ export default function NewMeetingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Vibrant Header */}
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-500 pb-20 pt-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="text-primary hover:text-emerald-800"
-            >
-              ← Back to Dashboard
-            </button>
-            <h1 className="text-xl font-semibold text-gray-900">Book New Meeting</h1>
-            <div className="w-32"></div>
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center space-x-3 mb-2">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="text-emerald-100 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-3xl font-bold text-white">Book New Meeting</h1>
+            </div>
+            <p className="text-emerald-50 text-lg opacity-90 pl-9">
+              Schedule a new appointment quickly and easily.
+            </p>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
-          {/* VP Selector (for EAs) */}
-          {user?.role === 'EA' && delegatedVPs.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                📋 Booking for VP *
-              </label>
-              <select
-                value={selectedVPId}
-                onChange={(e) => setSelectedVPId(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              >
-                {delegatedVPs.map((delegation) => (
-                  <option key={delegation.vp.id} value={delegation.vp.id}>
-                    {delegation.vp.name} ({delegation.vp.email})
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-600 mt-1">
-                You are booking this meeting on behalf of the selected VP
-              </p>
-            </div>
-          )}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Meeting Title */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Meeting Title *
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              placeholder="e.g., Strategy Review"
-            />
-          </div>
+          {/* Main Booking Form */}
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-6">
 
-          {/* Priority */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Priority *
-            </label>
-            <select
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-            >
-              <option value="LOW">🟢 Low Priority</option>
-              <option value="MEDIUM">🟡 Medium Priority</option>
-              <option value="HIGH">🟠 High Priority</option>
-              <option value="URGENT">🔴 Urgent</option>
-            </select>
-          </div>
+              {/* VP Selector (for EAs) */}
+              {user?.role === 'EA' && delegatedVPs.length > 0 && (
+                <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-blue-900 mb-2">
+                    📋 Booking on behalf of
+                  </label>
+                  <select
+                    value={selectedVPId}
+                    onChange={(e) => setSelectedVPId(e.target.value)}
+                    required
+                    className="w-full px-3 py-2.5 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                  >
+                    {delegatedVPs.map((delegation) => (
+                      <option key={delegation.vp.id} value={delegation.vp.id}>
+                        {delegation.vp.name} ({delegation.vp.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-          {/* Date and Time */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date *
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                min={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Start Time *
-              </label>
-              <input
-                type="time"
-                name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Duration (minutes) *
-              </label>
-              <select
-                name="durationMinutes"
-                value={formData.durationMinutes}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              >
-                <option value={15}>15 minutes</option>
-                <option value={30}>30 minutes</option>
-                <option value={45}>45 minutes</option>
-                <option value={60}>1 hour</option>
-                <option value={90}>1.5 hours</option>
-                <option value={120}>2 hours</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Conflict Detection */}
-          {conflictMessage && (
-            <div className={`p-3 rounded-lg text-sm ${conflictMessage.includes('✅')
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
-              }`}>
-              {conflictMessage}
-            </div>
-          )}
-
-          {/* Meeting Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Meeting Type *
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, type: 'VIRTUAL' })}
-                className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'VIRTUAL'
-                  ? 'border-primary bg-emerald-50'
-                  : 'border-gray-300 hover:border-gray-400'
-                  }`}
-              >
-                <div className="text-2xl mb-2">💻</div>
-                <div className="font-medium">Virtual</div>
-                <div className="text-xs text-gray-500">Teams/Zoom link</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, type: 'IN_PERSON' })}
-                className={`p-4 border-2 rounded-lg transition-all ${formData.type === 'IN_PERSON'
-                  ? 'border-primary bg-emerald-50'
-                  : 'border-gray-300 hover:border-gray-400'
-                  }`}
-              >
-                <div className="text-2xl mb-2">📍</div>
-                <div className="font-medium">In-Person</div>
-                <div className="text-xs text-gray-500">Office location</div>
-              </button>
-            </div>
-          </div>
-
-          {/* Location (for in-person) */}
-          {formData.type === 'IN_PERSON' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                placeholder="e.g., Conference Room A, Building 2"
-              />
-            </div>
-          )}
-
-          {/* Attendee Information */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Attendee Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Meeting Details Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Attendee Name *
-                </label>
-                <input
-                  type="text"
-                  name="attendeeName"
-                  value={formData.attendeeName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="John Doe"
-                />
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <span className="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg mr-2">
+                    <AlignLeft className="w-4 h-4" />
+                  </span>
+                  Meeting Details
+                </h3>
+
+                <div className="space-y-4">
+                  {/* Title */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Title *
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:text-gray-400"
+                      placeholder="e.g., Q4 Strategy Review"
+                    />
+                  </div>
+
+                  {/* Type & Priority Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Meeting Type *
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, type: 'VIRTUAL' })}
+                          className={`px-3 py-2.5 border rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${formData.type === 'VIRTUAL'
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500'
+                            : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                        >
+                          <Video className="w-4 h-4" />
+                          <span>Virtual</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, type: 'IN_PERSON' })}
+                          className={`px-3 py-2.5 border rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${formData.type === 'IN_PERSON'
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500'
+                            : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                        >
+                          <MapPin className="w-4 h-4" />
+                          <span>In-Person</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Priority *
+                      </label>
+                      <select
+                        name="priority"
+                        value={formData.priority}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-white"
+                      >
+                        <option value="LOW">Low Priority</option>
+                        <option value="MEDIUM">Medium Priority</option>
+                        <option value="HIGH">High Priority</option>
+                        <option value="URGENT">Urgent Priority</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Location (Conditional) */}
+                  {formData.type === 'IN_PERSON' && (
+                    <div className="animate-in fade-in slide-in-from-top-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Location Description *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                          required
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                          placeholder="e.g., Conference Room A, Building 2"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              <hr className="border-gray-100" />
+
+              {/* Date & Time Section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Attendee Email *
-                </label>
-                <input
-                  type="email"
-                  name="attendeeEmail"
-                  value={formData.attendeeEmail}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="john@example.com"
-                />
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <span className="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg mr-2">
+                    <Calendar className="w-4 h-4" />
+                  </span>
+                  Schedule
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={handleChange}
+                      required
+                      min={format(new Date(), 'yyyy-MM-dd')}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Start Time *
+                      </label>
+                      <input
+                        type="time"
+                        name="startTime"
+                        value={formData.startTime}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Duration *
+                      </label>
+                      <select
+                        name="durationMinutes"
+                        value={formData.durationMinutes}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-white"
+                      >
+                        <option value={15}>15m</option>
+                        <option value={30}>30m</option>
+                        <option value={45}>45m</option>
+                        <option value={60}>1h</option>
+                        <option value={90}>1.5h</option>
+                        <option value={120}>2h</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conflict Status */}
+                {conflictMessage && (
+                  <div className={`mt-3 p-3 rounded-lg text-sm font-medium flex items-center ${conflictMessage === 'SAFE'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                    : 'bg-amber-50 text-amber-700 border border-amber-100'
+                    }`}>
+                    {conflictMessage === 'SAFE' ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Slot is available
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-4 h-4 mr-2" />
+                        Warning: Potential time conflict detected
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
 
-          {/* Agenda */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Agenda
-            </label>
-            <textarea
-              name="agenda"
-              value={formData.agenda}
-              onChange={handleChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              placeholder="Meeting agenda and topics to discuss..."
-            />
-          </div>
+              <hr className="border-gray-100" />
 
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Notes
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              placeholder="Any additional information..."
-            />
-          </div>
+              {/* Attendee Section */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <span className="bg-emerald-100 text-emerald-600 p-1.5 rounded-lg mr-2">
+                    <User className="w-4 h-4" />
+                  </span>
+                  Attendee Info
+                </h3>
 
-          {/* Submit Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t">
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || checkingConflict}
-              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400"
-            >
-              {loading ? 'Creating...' : 'Create Meeting'}
-            </button>
-          </div>
-        </form>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="attendeeName"
+                      value={formData.attendeeName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      name="attendeeEmail"
+                      value={formData.attendeeEmail}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                </div>
+              </div>
 
-        {/* Available Slots Sidebar */}
-        {availableSlots.length > 0 && (
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-medium text-emerald-900 mb-3">💡 Available Slots Today</h3>
-            <div className="space-y-2">
-              {availableSlots.slice(0, 5).map((slot, index) => (
+              {/* Form Actions */}
+              <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100">
                 <button
-                  key={index}
                   type="button"
-                  onClick={() => {
-                    const startTime = format(new Date(slot.start), 'HH:mm');
-                    setFormData({ ...formData, startTime });
-                  }}
-                  className="w-full text-left px-3 py-2 bg-white rounded border border-emerald-300 hover:bg-emerald-100 text-sm"
+                  onClick={() => router.push('/dashboard')}
+                  className="px-6 py-2.5 border border-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  {format(new Date(slot.start), 'h:mm a')} - {format(new Date(slot.end), 'h:mm a')}
+                  Cancel
                 </button>
-              ))}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 disabled:bg-emerald-400 disabled:cursor-not-allowed transition-all flex items-center shadow-lg shadow-emerald-500/20"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Scheduling...
+                    </>
+                  ) : (
+                    'Confirm Booking'
+                  )}
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          {/* Sidebar: Available Slots */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg mr-2">
+                  <Clock className="w-4 h-4" />
+                </span>
+                Quick Slots
+              </h3>
+
+              {availableSlots.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-500 mb-3">
+                    Available times for {format(new Date(formData.date), 'MMMM d')}:
+                  </p>
+                  {availableSlots.slice(0, 6).map((slot, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => {
+                        const startTime = format(new Date(slot.start), 'HH:mm');
+                        setFormData({ ...formData, startTime });
+                      }}
+                      className="w-full text-left px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-emerald-500 hover:ring-1 hover:ring-emerald-500 hover:bg-emerald-50/50 transition-all text-sm group"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-700 group-hover:text-emerald-700">
+                          {format(new Date(slot.start), 'h:mm a')}
+                        </span>
+                        <span className="text-xs text-gray-400 group-hover:text-emerald-500">
+                          Select
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Select a date to view available time slots.</p>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </main>
     </div>
   );
