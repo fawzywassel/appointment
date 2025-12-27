@@ -153,6 +153,15 @@ export default function DashboardPage() {
           >
             Settings
           </button>
+
+          {user.role === 'ADMIN' && (
+            <button
+              onClick={() => router.push('/admin/users')}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+            >
+              Manage Users
+            </button>
+          )}
         </div>
 
         {/* Upcoming Meetings */}
@@ -194,10 +203,10 @@ export default function DashboardPage() {
                     <div>
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${meeting.status === 'CONFIRMED'
-                            ? 'bg-green-100 text-green-800'
-                            : meeting.status === 'PENDING'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
+                          ? 'bg-green-100 text-green-800'
+                          : meeting.status === 'PENDING'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
                           }`}
                       >
                         {meeting.status}

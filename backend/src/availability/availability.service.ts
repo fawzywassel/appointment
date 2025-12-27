@@ -150,13 +150,23 @@ export class AvailabilityService {
     });
     const timezone = user?.timezone || 'UTC';
 
+    console.log(`[Availability Debug] Checking slot for User ${userId}`);
+    console.log(`[Availability Debug] Start Time (UTC): ${startTime.toISOString()}`);
+    console.log(`[Availability Debug] User Timezone: ${timezone}`);
+
     // Convert start time to user's timezone
     const zonedStartTime = TimezoneUtil.utcToTimezone(startTime, timezone);
+    console.log(`[Availability Debug] Zoned Start Time: ${zonedStartTime.toString()}`);
+
     const dayName = format(zonedStartTime, 'EEEE').toLowerCase();
     const dayWorkingHours = workingHours[dayName] || [];
+    console.log(`[Availability Debug] Day: ${dayName}`);
+    console.log(`[Availability Debug] Working Hours: ${JSON.stringify(dayWorkingHours)}`);
 
     // Check if time is within working hours
     const timeStr = format(zonedStartTime, 'HH:mm');
+    console.log(`[Availability Debug] Time String: ${timeStr}`);
+
     let withinWorkingHours = false;
 
     for (const period of dayWorkingHours) {
@@ -165,6 +175,8 @@ export class AvailabilityService {
         break;
       }
     }
+
+    console.log(`[Availability Debug] Within Working Hours: ${withinWorkingHours}`);
 
     if (!withinWorkingHours) {
       return false;
