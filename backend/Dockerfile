@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install all dependencies (including dev dependencies for ts-node)
+# Install all dependencies (including dev dependencies for ts-node) and openssl for Prisma
+RUN apk add --no-cache openssl
 RUN npm install
 
 # Copy source code

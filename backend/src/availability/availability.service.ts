@@ -142,11 +142,21 @@ export class AvailabilityService {
   ): Promise<boolean> {
     const rules = await this.getAvailabilityRules(userId);
     const workingHours = rules.workingHours as WorkingHours;
-    const dayName = format(startTime, 'EEEE').toLowerCase();
+
+    // Get user timezone
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { timezone: true },
+    });
+    const timezone = user?.timezone || 'UTC';
+
+    // Convert start time to user's timezone
+    const zonedStartTime = TimezoneUtil.utcToTimezone(startTime, timezone);
+    const dayName = format(zonedStartTime, 'EEEE').toLowerCase();
     const dayWorkingHours = workingHours[dayName] || [];
 
     // Check if time is within working hours
-    const timeStr = format(startTime, 'HH:mm');
+    const timeStr = format(zonedStartTime, 'HH:mm');
     let withinWorkingHours = false;
 
     for (const period of dayWorkingHours) {
