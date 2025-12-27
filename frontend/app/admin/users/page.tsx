@@ -100,39 +100,54 @@ export default function UsersPage() {
     if (!user || user.role !== 'ADMIN') return null;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm border-b">
+        <div className="min-h-screen bg-gray-50/50">
+            {/* Vibrant Header */}
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-500 pb-20 pt-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <h1 className="text-xl font-semibold text-gray-900">
-                            User Management
-                        </h1>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                        <div>
+                            <div className="flex items-center space-x-3 mb-2">
+                                <button
+                                    onClick={() => router.push('/dashboard')}
+                                    className="text-emerald-100 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                </button>
+                                <h1 className="text-3xl font-bold text-white">User Management</h1>
+                            </div>
+                            <p className="text-emerald-50 text-lg opacity-90 pl-9">
+                                Manage system users, roles, and permissions.
+                            </p>
+                        </div>
                         <button
-                            onClick={() => router.push('/dashboard')}
-                            className="text-gray-600 hover:text-gray-900"
+                            onClick={handleCreate}
+                            className="bg-white text-emerald-600 hover:bg-emerald-50 font-semibold py-3 px-6 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center space-x-2"
                         >
-                            Back to Dashboard
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Create User</span>
                         </button>
                     </div>
                 </div>
-            </nav>
+            </div>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg font-medium text-gray-900">All Users</h2>
-                    <button
-                        onClick={handleCreate}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-                    >
-                        Create User
-                    </button>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-12">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <h2 className="text-lg font-semibold text-gray-900">All System Users</h2>
+                        <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-200">
+                            Total: {users.length}
+                        </span>
+                    </div>
+                    <UserListTable
+                        users={users}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
                 </div>
-
-                <UserListTable
-                    users={users}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
 
                 <UserFormModal
                     isOpen={isModalOpen}

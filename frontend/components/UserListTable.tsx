@@ -55,7 +55,7 @@ export default function UserListTable({ users, onEdit, onDelete }: UserListTable
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button
                                     onClick={() => onEdit(user)}
-                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                    className="text-emerald-600 hover:text-emerald-900 mr-4"
                                 >
                                     Edit
                                 </button>

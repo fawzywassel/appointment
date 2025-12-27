@@ -69,7 +69,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user }: UserF
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2"
                         />
                     </div>
 
@@ -81,7 +81,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user }: UserF
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             disabled={!!user} // Email is immutable for now
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 disabled:bg-gray-100"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2 disabled:bg-gray-100"
                         />
                     </div>
 
@@ -90,7 +90,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user }: UserF
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2"
                         >
                             <option value="ATTENDEE">Attendee</option>
                             <option value="VP">VP</option>
@@ -107,7 +107,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user }: UserF
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 border p-2"
                                 minLength={6}
                             />
                         </div>
@@ -124,7 +124,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user }: UserF
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 disabled:opacity-50"
                         >
                             {loading ? 'Saving...' : 'Save'}
                         </button>
